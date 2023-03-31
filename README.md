@@ -8,6 +8,11 @@ https://github.com/facebookresearch/detectron2
 # 使い方
 
 
+
+# cc0クローリング
+pexels api
+
+
 # zenn記事
 
 
