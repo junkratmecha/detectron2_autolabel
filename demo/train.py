@@ -16,28 +16,28 @@ def get_class_names(txt_path):
         class_names = [line.strip() for line in f.readlines()]
     return class_names
 
-class_names = get_class_names("./insect/classes.txt")
-coins_metadata = MetadataCatalog.get("insect").set(thing_classes=class_names)  # Set metadata here
-dataset_dicts = load_coco_json("./insect/insect.json", "./insect", "insect")
-DatasetCatalog.register("insect", lambda: dataset_dicts)  # Register dataset
+class_names = get_class_names("./robot/classes.txt")
+coins_metadata = MetadataCatalog.get("robot").set(thing_classes=class_names)  # Set metadata here
+dataset_dicts = load_coco_json("./robot/robot.json", "./robot", "robot")
+DatasetCatalog.register("robot", lambda: dataset_dicts)  # Register dataset
 
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
-cfg.DATASETS.TRAIN = ("insect",)
+cfg.DATASETS.TRAIN = ("robot",)
 cfg.DATASETS.TEST = ()
 cfg.DATALOADER.NUM_WORKERS = 0
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 cfg.SOLVER.IMS_PER_BATCH = 2
 cfg.SOLVER.BASE_LR = 0.0004
 cfg.SOLVER.MAX_ITER = (
-    500
+    1500
 )
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = (
     128
 )
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(class_names)
 
-ckpt_folder = os.path.join(os.getcwd(), "ckpt")
+ckpt_folder = os.path.join(os.getcwd(), "ckpt/robot")
 os.makedirs(ckpt_folder, exist_ok=True)
 cfg.OUTPUT_DIR = ckpt_folder
 

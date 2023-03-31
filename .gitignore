@@ -1,0 +1,11 @@
+/*
+!.gitignore
+!README.md
+!/demo
+/demo/img_test
+/demo/img_train
+/demo/labels
+/demo/__pycache__
+/demo/ckpt
+/demo/org_script
+/demo/tmp
