@@ -30,7 +30,7 @@ def download_photos(photos, keyword, folder="./pexels"):
 
 # メイン処理
 def main():
-    keyword = "machine human"
+    keyword = "droid"
     search_result = search_photos(keyword)
     download_photos(search_result["photos"], keyword)
 

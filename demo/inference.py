@@ -43,7 +43,7 @@ def detect_and_visualize(image_path, predictor, cfg, class_names):
 
     # custom dataset
     outputs = predictor(im)
-    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get("robot"), scale=1.2)
+    v = Visualizer(im[:, :, ::-1], MetadataCatalog.get("img_train"), scale=1.2)
 
     v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
     outputs = predictor(im)
@@ -127,17 +127,17 @@ def save_yolo_label(image_path, class_id, x_center, y_center, w, h):
 
 def main():
     cfg = get_cfg()
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
+    cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
 
     # pre-trained model
-    # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
+    # cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
 
     # custom dataset
-    cfg.MODEL.WEIGHTS = os.path.join("ckpt/robot", "model_final.pth")
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2
+    cfg.MODEL.WEIGHTS = os.path.join("ckpt/img_train", "model_final.pth")
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
     class_names = get_class_names("./img_train/classes.txt")
-    MetadataCatalog.get("robot").set(thing_classes=class_names)
+    MetadataCatalog.get("img_train").set(thing_classes=class_names)
     image_folder = "./img_test"
 
     predictor = DefaultPredictor(cfg)
