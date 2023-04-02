@@ -9,6 +9,7 @@ import cv2
 import random
 import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
@@ -48,9 +49,10 @@ def detect_and_visualize(image_path, predictor, cfg, class_names):
     v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
     outputs = predictor(im)
 
-    # 少量で画像を確認する
-    cv2.imshow("Object Detection", v.get_image()[:, :, ::-1])
-    cv2.waitKey(0)
+    # 画像を確認する
+    # cv2.imshow("Object Detection", v.get_image()[:, :, ::-1])
+    # cv2.waitKey(0)
+
     instances = outputs['instances']
     height, width = im.shape[:2]
     annotations = []
@@ -63,6 +65,8 @@ def detect_and_visualize(image_path, predictor, cfg, class_names):
         # YOLOアノテーションの保存
         x_center, y_center, w, h = convert_to_yolo_label(bbox, width, height)
         save_yolo_label(image_path, class_id, x_center, y_center, w, h)
+        # Save Pascal VOC annotations
+        save_pascal_voc_annotation(image_path, class_id, x1, y1, x2, y2, class_names)
 
     return {"image_path": image_path, "annotations": annotations}
 
@@ -124,6 +128,59 @@ def save_yolo_label(image_path, class_id, x_center, y_center, w, h):
 
     with open(label_file, "a") as f:
         f.write(f"{class_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}\n")
+
+def save_pascal_voc_annotation(image_path, class_id, x1, y1, x2, y2, class_names):
+    image_folder_path = os.path.dirname(os.path.abspath(image_path))
+    annotation_folder = os.path.join(image_folder_path, "..", "annotations_voc")
+    os.makedirs(annotation_folder, exist_ok=True)
+    annotation_file = os.path.join(annotation_folder, os.path.splitext(os.path.basename(image_path))[0] + ".xml")
+
+    if not os.path.exists(annotation_file):
+        create_pascal_voc_xml(image_path, annotation_file)
+
+    tree = ET.parse(annotation_file)
+    root = tree.getroot()
+
+    obj = ET.SubElement(root, "object")
+    ET.SubElement(obj, "name").text = class_names[class_id]
+    ET.SubElement(obj, "pose").text = "Unspecified"
+    ET.SubElement(obj, "truncated").text = "0"
+    ET.SubElement(obj, "difficult").text = "0"
+
+    bndbox = ET.SubElement(obj, "bndbox")
+    ET.SubElement(bndbox, "xmin").text = str(x1)
+    ET.SubElement(bndbox, "ymin").text = str(y1)
+    ET.SubElement(bndbox, "xmax").text = str(x2)
+    ET.SubElement(bndbox, "ymax").text = str(y2)
+
+    tree.write(annotation_file)
+
+
+def create_pascal_voc_xml(image_path, annotation_file):
+    img = cv2.imread(image_path)
+    height, width, depth = img.shape
+
+    root = ET.Element("annotation")
+
+    folder = ET.SubElement(root, "folder")
+    folder.text = "images"
+
+    filename = ET.SubElement(root, "filename")
+    filename.text = os.path.basename(image_path)
+
+    source = ET.SubElement(root, "source")
+    ET.SubElement(source, "database").text = "Unknown"
+
+    size = ET.SubElement(root, "size")
+    ET.SubElement(size, "width").text = str(width)
+    ET.SubElement(size, "height").text = str(height)
+    ET.SubElement(size, "depth").text = str(depth)
+
+    segmented = ET.SubElement(root, "segmented")
+    segmented.text = "0"
+
+    tree = ET.ElementTree(root)
+    tree.write(annotation_file)
 
 def main():
     cfg = get_cfg()
