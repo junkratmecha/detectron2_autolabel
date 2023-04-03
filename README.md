@@ -30,9 +30,7 @@
  * 学習ログ py -m tensorboard.main --logdir ./demo/ckpt/img_train
  * cc0画像収集 pexels_api_downloader.py/pixabay_api_downloader.py(要api_key。一応CC0集めれるがkeywordで欲しいのが集まらない)
 
-# 記事
-- [マイ記事](https://zenn.dev/spritaro/articles/dfdfaadf1d9100)
-
-- 参考になった記事
- * [Detectron2 を使ってみよう：Pre-Trainedモデルの使い方説明](https://www.ushiji.online/detectron2#keypoint-detection)
- * [Detectron2で小銭を数える](https://qiita.com/bear_montblanc/items/5bb1ad3506718120682d)
+# マイ記事 + 参考になった記事
+- [マイ記事](https://zenn.dev/junkratmecha/articles/516e884a3116b6)
+- [Detectron2 を使ってみよう：Pre-Trainedモデルの使い方説明](https://www.ushiji.online/detectron2#keypoint-detection)  
+- [Detectron2で小銭を数える](https://qiita.com/bear_montblanc/items/5bb1ad3506718120682d)
